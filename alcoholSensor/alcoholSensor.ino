@@ -1,21 +1,30 @@
-/*Gas sensor example*/
-int mq3 = A0; //connect Gas sensor to analogic pin A0
-int led = 13;
-int threshold =300; //change the threshold value for your use
-void setup(){
-   Serial.begin(9600); //initialize serial comunication at 9600 bps
-   pinMode(led, OUTPUT);
+#define heaterSelPin 15
+
+void setup() {
+    Serial.begin(9600);
+    pinMode(heaterSelPin,OUTPUT);   // set the heaterSelPin as digital output.
+    digitalWrite(heaterSelPin,LOW); // Start to heat the sensor
 }
- 
-void loop()
-{
-    int mq3 = analogRead(mq3);//read sensor value
-    if(mq3>=threshold){//check if it is exceeded the threshold value
-      digitalWrite(led, HIGH);
-      Serial.println(mq3);//print on serial monitor the sensor value
-      delay(500);
-    } else {
-      digitalWrite(led, LOW);
+
+void loop() {
+    float sensor_volt;
+    float RS_air; //  Get the value of RS via in a clear air
+    float sensorValue;
+
+/*--- Get a average data by testing 100 times ---*/
+    for(int x = 0 ; x < 100 ; x++)
+    {
+        sensorValue = sensorValue + analogRead(A0);
     }
-    delay(100); //slow down the output
+    sensorValue = sensorValue/100.0;
+/*-----------------------------------------------*/
+
+    sensor_volt = sensorValue/1024*5.0;
+    RS_air = sensor_volt/(5.0-sensor_volt); // omit *R16
+    Serial.print("sensor_volt = ");
+    Serial.print(sensor_volt);
+    Serial.println("V");
+    Serial.print("RS_air = ");
+    Serial.println(RS_air);
+    delay(1000);
 }
